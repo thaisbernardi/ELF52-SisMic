@@ -21,6 +21,7 @@ Na mesma janela de visualização dos registradores, é possivel visualizar indi
 Na janela de disassembly, pode-se observar para cada condição a posição da memória em que ela está amrazenada, seu opcode, seu mnemônico, registradores utilizados e valores. O endereço visto é o endereço para qual o PC vai apontar quando a execução for a próxima a ser executada, nessa execução indo de 0x40 a 0x54. Pelo opcode, podemos observar se a operação é de 16 ou 32 bits, quando esse é composto por 1 ou 2 valores hexadecimais, respectivamente. Neste código, todos os opcodes são de 32 bits. 
 
 Mudando os comandos MOV para MVN, as saídas são
+
 R0: 0xffff ffaa
 
 R1: 0x0055 ffff 
