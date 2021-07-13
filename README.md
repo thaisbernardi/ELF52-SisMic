@@ -36,3 +36,11 @@ R5: 0xe000 00ab
 
 O comando MVN faz uma operação lógica NOT bit a bit no valor, e o armazena no registrador Rd
 O valor 0x0000 0055 ou (0000000000000000 0000000001010101b), ao ser invertido bit a bit gera um valor muito grande, por ter uma sequencia de 1s no inicio. Para manter o tamanho maximo do valor no registrador, os shifts nao se comportam da mesma forma que com os comandos de MOV.
+
+
+# ELF52-SisMic_Laboratorio_02
+
+A sub-rotina Mul16B faz a multiplicação por *logical shifts* sucessivos no registrador, com um numero de vezes definido pelo segundo registrador do produto. 
+A sub-rotina Fat32b faz multiplicações em loop usando o comando básico de multiplicação, em loop, diminuindo sempre o valor a ser multiplicado na proxima iteração.
+Ambas sub-rotinas estão comentadas. 
+
