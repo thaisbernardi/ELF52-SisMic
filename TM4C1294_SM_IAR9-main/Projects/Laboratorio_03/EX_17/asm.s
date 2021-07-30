@@ -10,8 +10,8 @@
 
 SYSCTL_RCGCGPIO_R       EQU     0x400FE608
 SYSCTL_PRGPIO_R		EQU     0x400FEA08
-PORTN_F_BIT             EQU     1000000100000b ; bit 12 = Port F e N
-PORTN_BIT               EQU     1000000000000b ; 
+PORTN_BIT               EQU     0000000000100000b ; bit 5 = Port F 
+PORTF_BIT               EQU     0001000000000000b ; bit 12 = porta N
 
 GPIO_PORTN_DATA_R    	EQU     0x40064000
 GPIO_PORTN_DIR_R     	EQU     0x40064400
@@ -21,129 +21,100 @@ GPIO_PORTF_DATA_R    	EQU     0x4005D000
 GPIO_PORTF_DIR_R     	EQU     0x4005D400
 GPIO_PORTF_DEN_R     	EQU     0x4005D51C
 
+__iar_program_start
+
+main    MOV R0, #PORTN_BIT
+        BL iniciaport
+        MOV R0, #PORTF_BIT
+        BL iniciaport
+                
+        LDR R0, =GPIO_PORTN_DATA_R
+        LDR R1, =GPIO_PORTN_DIR_R
+        LDR R2, =GPIO_PORTN_DEN_R
+        MOV R3, #000000011b ; bit 0 (D2) e 1 (D1)
+        BL conf
+        MOV R4, #000000000b
+        STR R4, [R0, R3, LSL #2] 
         
-//main    MOV R2, #PORTN_F_BIT
-//	LDR R0, =SYSCTL_RCGCGPIO_R
-//	LDR R1, [R0] ; leitura do estado anterior
-//	ORR R1, R2 ; habilita port N
-//	STR R1, [R0] ; escrita do novo estado
-//
-//      LDR R0, =SYSCTL_PRGPIO_R
-//wait	LDR R2, [R0] ; leitura do estado atual
-//	TEQ R1, R2 ; clock do port N habilitado?
-//	BNE wait ; caso negativo, aguarda
-//
-//      MOV R2, #00000010b ; bit 0
-//        
-//	LDR R0, =GPIO_PORTN_DIR_R
-//	LDR R1, [R0] ; leitura do estado anterior
-//	ORR R1, R2 ; bit de saída
-//	STR R1, [R0] ; escrita do novo estado
-//
-//	LDR R0, =GPIO_PORTN_DEN_R
-//	LDR R1, [R0] ; leitura do estado anterior
-//	ORR R1, R2 ; habilita função digital
-//	STR R1, [R0] ; escrita do novo estado
+        LDR R0, =GPIO_PORTF_DATA_R
+        LDR R1, =GPIO_PORTF_DIR_R
+        LDR R2, =GPIO_PORTF_DEN_R
+        MOV R3, #000010001b ; bits 0 e 4 
+        BL conf
+        MOV R4, #000000000b
+        STR R4, [R0, R3, LSL #2] 
+        
+        MOV R0, #0b
+loop   
+        ADD R0, R0, #1
+        Bl cont
+        B loop
 
-//        MOV R1, #000000001b ; estado inicial
-// 	LDR R0, = GPIO_PORTN_DATA_R
-//loop	STR R1, [R0, R2, LSL #2] ; aciona LED com estado atual
-//        MOVT R3, #0x000F ; constante de atraso 
-//delay   CBZ R3, theend ; 1 clock
-//        SUB R3, R3, #1 ; 1 clock
-//        B delay ; 3 clocks
-//theend  EOR R1, R1, R2 ; troca o estado
-//        B loop
+             
+        
+cont    PUSH {LR, R3, R4}
 
-delay   MOVT R3, #0x000F ; constante de atraso 
-        CBZ R3, ret ; 1 clock
-        SUB R3, R3, #1 ; 1 clock
-        B delay ; 3 clocks
-ret     BX LR
+        LDR R1, =GPIO_PORTN_DATA_R
+        MOV R2, #000000011b
+        
+        AND R4, R0, #0011b
+        LSR R3, R4, #1
+        LSL R4, R4, #1
+        ADD R4, R3
+        STR R4, [R1, R2, LSL #2]
+		
+	LDR R1, =GPIO_PORTF_DATA_R
+        MOV R2, #000010001b
 
-inicia  MOV R2, #PORTN_F_BIT
-	LDR R0, =SYSCTL_RCGCGPIO_R
-	LDR R1, [R0] ; leitura do estado anterior
-	ORR R1, R2 ; habilita port F e N
-	STR R1, [R0] ; escrita do novo estado
+        AND R3, R0, #0100b
+        LSL R4, R3, #2
+        
+        AND R3, R0, #1000b
+        LSR R3, R3, #3
+        ADD R4, R3
+		
+        STR R4, [R1, R2, LSL #2]
+        POP {R4, R3}
+        BL delay
+        POP {LR}
+        BX LR
+        
 
-        LDR R0, =SYSCTL_PRGPIO_R
-wait	LDR R2, [R0] ; leitura do estado atual
-	TEQ R1, R2 ; clock do port F e N habilitado?
+delay   PUSH {R4}
+        MOVT R4, #0x005F; constante de atraso 
+delayinit
+        CBZ R4, ret     ; 1 clock
+        SUB R4, R4, #1  ; 1 clock
+        B delayinit     ; 3 clocks
+ret     POP {R4}
+        BX LR
+
+        
+iniciaport	
+        LDR R2, =SYSCTL_RCGCGPIO_R ;;ver o que era pra ter em R1
+	LDR R1, [R2] ; leitura do estado anterior
+	ORR R1, R0 ; habilita port 
+	STR R1, [R2] ; escrita do novo estado
+
+        LDR R2, =SYSCTL_PRGPIO_R
+wait	LDR R0, [R2] ; leitura do estado atual
+	TEQ R1, R0 ; clock do port habilitado?
 	BNE wait ; caso negativo, aguarda
 
         BX LR
-////        
-conf    MOV R2, #00000001b ; bit 0 (D2) e 1 (D1) 
-        LDR R0, =GPIO_PORTN_DIR_R
-	LDR R1, [R0] ; leitura do estado anterior
-	ORR R1, R2 ; bit de saída
-	STR R1, [R0] ; escrita do novo estado
 
-	LDR R0, =GPIO_PORTN_DEN_R
-	LDR R1, [R0] ; leitura do estado anterior
-	ORR R1, R2 ; habilita função digital
-	STR R1, [R0] ; escrita do novo estado
+conf    
+	LDR R4, [R1] ; leitura do estado anterior
+	ORR R4, R3 ; bit de saída
+	STR R4, [R1] ; escrita do novo estado
 
-        MOV R2, #00000001b ;
-        LDR R0, =GPIO_PORTF_DIR_R
-	LDR R1, [R0] ; leitura do estado anterior
-	ORR R1, R2 ; bit de saída
-	STR R1, [R0] ; escrita do novo estado
-
-	LDR R0, =GPIO_PORTF_DEN_R
-	LDR R1, [R0] ; leitura do estado anterior
-	ORR R1, R2 ; habilita função digital
-	STR R1, [R0] ; escrita do novo estado
+	LDR R4, [R2] ; leitura do estado anterior
+	ORR R4, R3 ; habilita função digital
+	STR R4, [R2] ; escrita do novo estado
 
         BX LR
-auxN    LDR R0, = GPIO_PORTN_DATA_R
-        STR R1, [R0, R2, LSL #2]
-        BL delay
-        EOR R1, R1, R2
-        BX LR
-//
-auxF    LDR R4, = GPIO_PORTF_DATA_R
-        STR R5, [R4, R6, LSL #2]
-        BL delay
-        EOR R5, R5, R6
-        BX LR
-//        
-//contN   MOV R2, #00000001b ; LED 0 
-//        MOV R1, R2
-//        B auxN
-//        MOV R2, #00000010b ; LED 1 
-//        MOV R1, R2
-//        B auxN
-//        MOV R2, #00000011b ; LED 1 
-//        MOV R1, R2
-//        B auxN
-//        BX LR
-//        
-//        
-//cont    B contN
-//        MOV R6, #00010000b ; LED 2 
-//        MOV R5, R5
-//        B auxF
-//        MOV R6, #00000001b ; LED 3 
-//        MOV R5, R5
-//        B auxF
-//        MOV R6, #00010001b ; LED 2 e 3 
-//        MOV R5, R5
-//        B auxF
-//        BX LR        
-//        
-
-__iar_program_start
-
-main    BL inicia
-        BL conf
-        ;BL auxN
-loop    MOV R6, #00000001b
-        MOV R5, #000000001b ; estado inicial
-        BL auxF
-        B loop
-
+       
+ 
         ;; Forward declaration of sections.
         SECTION CSTACK:DATA:NOROOT(3)
         SECTION .intvec:CODE:NOROOT(2)

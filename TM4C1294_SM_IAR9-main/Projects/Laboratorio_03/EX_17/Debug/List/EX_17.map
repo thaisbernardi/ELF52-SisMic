@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# IAR ELF Linker V9.10.2.313/W64 for ARM                  22/Jul/2021  22:39:23
+# IAR ELF Linker V9.10.2.313/W64 for ARM                  29/Jul/2021  23:53:24
 # Copyright 2007-2021 IAR Systems AB.
 #
 #    Output file  =
@@ -45,10 +45,10 @@ No sections matched the following patterns:
   .intvec   ro code          0x0    0x40  asm.o [1]
                           - 0x40    0x40
 
-"P1":                               0xb2
-  .text     ro code         0x40    0xb0  asm.o [1]
-  .text     ro code         0xf0     0x2  asm.o [1]
-                          - 0xf2    0xb2
+"P1":                               0xea
+  .text     ro code         0x40    0xe8  asm.o [1]
+  .text     ro code        0x128     0x2  asm.o [1]
+                         - 0x12a    0xea
 
 "P2":                             0x8000
   CSTACK             0x2000'0000  0x8000  <Block>
@@ -59,7 +59,7 @@ Unused ranges:
 
          From           To      Size
          ----           --      ----
-         0xf2     0xf'ffff  0xf'ff0e
+        0x12a     0xf'ffff  0xf'fed6
   0x2000'8000  0x2003'ffff  0x3'8000
 
 
@@ -75,13 +75,13 @@ command line/config:
     Total:
 
 D:\DocumentosHD\UTFPR\Engenharia\Micro\Labs\TM4C1294_SM_IAR9-main\TM4C1294_SM_IAR9-main\Projects\Laboratorio_03\EX_17\Debug\Obj: [1]
-    asm.o               242
+    asm.o               298
     --------------------------------
-    Total:              242
+    Total:              298
 
     Linker created            32'768
 ------------------------------------
-    Grand Total:        242   32'768
+    Grand Total:        298   32'768
 
 
 *******************************************************************************
@@ -92,13 +92,13 @@ Entry                    Address  Size  Type      Object
 -----                    -------  ----  ----      ------
 CSTACK$$Base         0x2000'0000         --   Gb  - Linker created -
 CSTACK$$Limit        0x2000'8000         --   Gb  - Linker created -
-__iar_program_start         0xbb        Code  Gb  asm.o [1]
+__iar_program_start         0x41        Code  Gb  asm.o [1]
 __vector_table               0x0        Data  Gb  asm.o [1]
 
 
 [1] = D:\DocumentosHD\UTFPR\Engenharia\Micro\Labs\TM4C1294_SM_IAR9-main\TM4C1294_SM_IAR9-main\Projects\Laboratorio_03\EX_17\Debug\Obj
 
-     242 bytes of readonly  code memory
+     298 bytes of readonly  code memory
   32'768 bytes of readwrite data memory
 
 Errors: none
