@@ -10,9 +10,8 @@
 
 SYSCTL_RCGCGPIO_R       EQU     0x400FE608
 SYSCTL_PRGPIO_R		EQU     0x400FEA08
-PORTN_BIT               EQU     0000000000100000b ; bit 5 = Port F 
-PORTF_BIT               EQU     0001000000000000b ; bit 12 = porta N
-PORTJ_BIT               EQU     0000000100000000b ; bit  8 = Port J
+PORTS_BITS              EQU     0001000100100000b ; bit 5 = Port F 
+
 
 GPIO_PORTN_DATA_R    	EQU     0x40064000
 GPIO_PORTN_DIR_R     	EQU     0x40064400
@@ -29,13 +28,9 @@ GPIO_PORTJ_PUR_R        EQU     0x40060510
 
 __iar_program_start
 
-main    MOV R0, #PORTN_BIT
+main    MOV R0, #PORTS_BITS
         BL iniciaport
-        MOV R0, #PORTF_BIT
-        BL iniciaport
-        MOV R0, #PORTF_BIT
-        BL iniciaport
-                
+
         LDR R0, =GPIO_PORTN_DATA_R
         LDR R1, =GPIO_PORTN_DIR_R
         LDR R2, =GPIO_PORTN_DEN_R
@@ -52,22 +47,41 @@ main    MOV R0, #PORTN_BIT
         MOV R4, #000000000b
         STR R4, [R0, R3, LSL #2] 
         
-        MOV R0, #00000011b ; 
+        MOV R0, #00010011b ; 
         BL conf_input
-        
-        MOV R0, #0b
+              
+        MOV R0, #1b
+loop
         LDR R1, =GPIO_PORTJ_DATA_R
         MOV R2, #000000011b
         LDR R3, [R1, R2, LSL #2]
-loop
-        CMP R3, #000000001b 
-        IT EQ
-        ADDEQ R0, R0, #1
         
-        CMP R3, #000000010b 
+        CMP R3, #000000001b                             ; -> le o botao PJ0 e se estiver pressionado adiciona um na variavel
         IT EQ
-        SUBEQ R0, R0, #1
+          ADDEQ R0, R0, #1b
+          
+        CMP R3, #000000010b                             ; -> le o botao PJ1 e se estiver pressionado subtrai um na variavel
+        IT EQ
+          SUBEQ R0, R0, #1b
+//        MOVS R4, R3 ;salva estado do botao 
+//
+//reading_loop
+//        LDR 
+//
+//if_not_pressed
+//        MOV R3, R4  
+//        BL delay
+//
+//if_pressed      
+//        CMP R3, #1b 
+//        IT EQ
+//          ADDEQ R0, R0, #1
+//        
+//        CMP R3, #10b 
+//        IT EQ
+//          SUBEQ R0, R0, #1
         
+//loop        
         Bl cont
         B loop
 
