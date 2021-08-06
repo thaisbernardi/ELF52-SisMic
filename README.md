@@ -44,3 +44,7 @@ A sub-rotina Mul16B faz a multiplicação por *logical shifts* sucessivos no reg
 A sub-rotina Fat32b faz multiplicações em loop usando o comando básico de multiplicação, em loop, diminuindo sempre o valor a ser multiplicado na proxima iteração.
 Ambas sub-rotinas estão comentadas. 
 
+# ELF52-SisMic_Laboratorio_04
+
+Para leitura dos SW1 e SW2 botões, é necessario habilita-los na sub-rotina Button_int_conf, colocando com valor alto os dois bits menos significativos do registrador utilizado para máscara com os registradores de configuração. 
+É possivel determinar qual botão foi pressionado baseando-se no valor de GPIO_RIS da porta J, que tem em 1 o bit correspondente ao botão. 
